@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Code Wall</title>
+  <style>
+    body { font-family: Arial; background: #f7f7f7; margin: 40px; }
+    h2 { text-align: center; }
+    form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; max-width: 600px; margin: 20px auto; }
+    input, textarea { width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    button { background: #007BFF; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .card { background: white; padding: 15px; border-radius: 10px; margin: 10px auto; max-width: 600px; box-shadow: 0 0 8px #ccc; }
+    pre { background: #eee; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    img { max-width: 100%; border-radius: 5px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>👩‍💻 Team Code Wall 👨‍💻</h2>
+
+  <form id="codeForm">
+    <input type="text" id="name" placeholder="Your Name" required>
+    <input type="text" id="description" placeholder="Short Description" required>
+    <textarea id="code" rows="6" placeholder="Paste your code here..." required></textarea>
+    <input type="url" id="image" placeholder="Paste dry run image link (optional)">
+    <button type="submit">Submit Code</button>
+  </form>
+
+  <div id="output"></div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyB2p2AZJAsL1cGsP6yozie_1VXhbT0IJea9i-5hlqyrpRHcprZJ4WfUtBYrAUA-ulWIQ/exec";
+
+    document.getElementById("codeForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById("name").value,
+        description: document.getElementById("description").value,
+        code: document.getElementById("code").value,
+        image: document.getElementById("image").value
+      };
+
+      await fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => alert("Code submitted successfully!"))
+      .catch(err => alert("Error submitting code!"));
+      
+      loadData();
+    });
+
+    async function loadData() {
+      const res = await fetch(scriptURL);
+      const entries = await res.json();
+      const output = document.getElementById("output");
+      output.innerHTML = "";
+      entries.reverse().forEach(entry => {
+        output.innerHTML += `
+          <div class="card">
+            <h3>${entry.name}</h3>
+            <p><strong>${entry.description}</strong></p>
+            <pre>${entry.code}</pre>
+            ${entry.image ? `<img src="${entry.image}" alt="Dry Run">` : ""}
+          </div>`;
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
